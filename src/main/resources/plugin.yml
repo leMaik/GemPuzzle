@@ -1,0 +1,3 @@
+name: GemPuzzle
+main: de.craften.plugins.gempuzzle.Plugin
+version: VERSION
