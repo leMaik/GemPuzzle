@@ -1,7 +1,10 @@
 package de.craften.plugins.gempuzzle.util;
 
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.ItemFrame;
 
 /**
  * Utility functions required for the plugin.
@@ -19,5 +22,14 @@ public class Util {
                 return block.getRelative(-frontBack, upDown, -leftRight);
         }
         throw new IllegalArgumentException("Unsupported BlockFace: " + face);
+    }
+
+    public static ItemFrame getItemFrame(Location location) {
+        for (Entity nearbyEntity : location.getWorld().getNearbyEntities(location, 1, 1, 1)) {
+            if (nearbyEntity instanceof ItemFrame && nearbyEntity.getLocation().getBlock().getLocation().equals(location)) {
+                return (ItemFrame) nearbyEntity;
+            }
+        }
+        return null;
     }
 }
