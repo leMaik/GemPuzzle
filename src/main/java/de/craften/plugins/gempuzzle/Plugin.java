@@ -43,14 +43,20 @@ public class Plugin extends JavaPlugin {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 1 && sender instanceof Player) {
-            if (args[0].equalsIgnoreCase("create")) {
-                ((Player) sender).setMetadata("gempuzzle.create", new FixedMetadataValue(this, true));
-                ((Player) sender).removeMetadata("gempuzzle.remove", this);
-                sender.sendMessage("Now right-click on the top-left item frame to create a gem puzzle.");
-            } else if (args[0].equalsIgnoreCase("remove")) {
-                ((Player) sender).setMetadata("gempuzzle.remove", new FixedMetadataValue(this, true));
-                ((Player) sender).removeMetadata("gempuzzle.create", this);
-                sender.sendMessage("Now right-click on a puzzle to remove it.");
+            if (sender.hasPermission("gempuzzle.manage")) {
+                if (args[0].equalsIgnoreCase("create")) {
+                    ((Player) sender).setMetadata("gempuzzle.create", new FixedMetadataValue(this, true));
+                    ((Player) sender).removeMetadata("gempuzzle.remove", this);
+                    ((Player) sender).removeMetadata("gempuzzle.shuffle", this);
+                    sender.sendMessage("Now right-click on the top-left item frame to create a gem puzzle.");
+                    return true;
+                } else if (args[0].equalsIgnoreCase("remove")) {
+                    ((Player) sender).setMetadata("gempuzzle.remove", new FixedMetadataValue(this, true));
+                    ((Player) sender).removeMetadata("gempuzzle.create", this);
+                    ((Player) sender).removeMetadata("gempuzzle.shuffle", this);
+                    sender.sendMessage("Now right-click on a puzzle to remove it.");
+                    return true;
+                }
             }
         }
         return false;
@@ -68,16 +74,18 @@ public class Plugin extends JavaPlugin {
     public void createPuzzle(ItemFrame topLeftItemFrame) {
         //auto-detect width
         int width = 1;
-        Block block = Util.getRelative(topLeftItemFrame.getLocation().getBlock(), topLeftItemFrame.getFacing(), 0, width, 0);
+        Block block = Util.getRelative(topLeftItemFrame.getLocation().getBlock(), topLeftItemFrame.getAttachedFace(), 0, width, 0);
         while (Util.getItemFrame(block.getLocation()) != null) {
             width++;
+            block = Util.getRelative(topLeftItemFrame.getLocation().getBlock(), topLeftItemFrame.getAttachedFace(), 0, width, 0);
         }
 
         //auto-detect height
         int height = 1;
-        block = Util.getRelative(topLeftItemFrame.getLocation().getBlock(), topLeftItemFrame.getFacing(), height, 0, 0);
+        block = Util.getRelative(topLeftItemFrame.getLocation().getBlock(), topLeftItemFrame.getAttachedFace(), -height, 0, 0);
         while (Util.getItemFrame(block.getLocation()) != null) {
             height++;
+            block = Util.getRelative(topLeftItemFrame.getLocation().getBlock(), topLeftItemFrame.getAttachedFace(), -height, 0, 0);
         }
 
         puzzles.add(new Puzzle(topLeftItemFrame.getLocation(), width, height, topLeftItemFrame.getFacing()));

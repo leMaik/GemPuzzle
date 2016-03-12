@@ -2,7 +2,6 @@ package de.craften.plugins.gempuzzle;
 
 import de.craften.plugins.gempuzzle.util.Util;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -73,12 +72,12 @@ public class ItemFrameListener implements Listener {
     }
 
     private boolean tryMove(Puzzle puzzle, ItemFrame itemFrame, int upDown, int leftRight) {
-        Block block = itemFrame.getLocation().getBlock();
-        Location neighborLocation = Util.getRelative(block, itemFrame.getFacing(), upDown, leftRight, 0).getLocation();
+        Location location = itemFrame.getLocation().getBlock().getLocation();
+        Location neighborLocation = Util.getRelative(location, itemFrame.getFacing(), upDown, leftRight, 0);
         if (puzzle.equals(plugin.getPuzzleAt(neighborLocation))) {
             ItemFrame neighbor = Util.getItemFrame(neighborLocation);
             if (neighbor == null) {
-                itemFrame.teleport(itemFrame.getLocation().add(neighborLocation).subtract(block.getLocation()));
+                itemFrame.teleport(itemFrame.getLocation().add(neighborLocation).subtract(location));
                 return true;
             }
         }

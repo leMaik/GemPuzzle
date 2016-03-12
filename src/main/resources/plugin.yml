@@ -3,9 +3,8 @@ main: de.craften.plugins.gempuzzle.Plugin
 version: VERSION
 commands:
   gempuzzle:
-    description: Create and remove gem puzzles.
+    description: Create or remove gem puzzles.
     usage: /gempuzzle create to create puzzles, /gempuzzle remove to remove puzzles
-    permission: gempuzzle.manage
 permissions:
   gempuzzle.manage:
     default: op
