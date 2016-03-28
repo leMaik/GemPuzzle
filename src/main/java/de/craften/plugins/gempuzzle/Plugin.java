@@ -58,6 +58,13 @@ public class Plugin extends JavaPlugin {
                     return true;
                 }
             }
+            if (args[0].equalsIgnoreCase("shuffle")) {
+                ((Player) sender).setMetadata("gempuzzle.shuffle", new FixedMetadataValue(this, true));
+                ((Player) sender).removeMetadata("gempuzzle.create", this);
+                ((Player) sender).removeMetadata("gempuzzle.remove", this);
+                sender.sendMessage("Now right-click on a puzzle to shuffle it.");
+                return true;
+            }
         }
         return false;
     }

@@ -1,7 +1,11 @@
 package de.craften.plugins.gempuzzle;
 
+import de.craften.plugins.gempuzzle.util.Util;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.ItemFrame;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * A puzzle.
@@ -59,6 +63,71 @@ public class Puzzle {
                         location.getBlockZ() < this.location.getBlockZ() + width;
             default:
                 return false;
+        }
+    }
+
+    public void shuffle() {
+        //Get all picture frames that make up this puzzle
+        ItemFrame[][] frames = new ItemFrame[height][width];
+        int emptyX = 0;
+        int emptyY = 0;
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                ItemFrame frame = Util.getItemFrame(Util.getRelative(location, blockFace.getOppositeFace(), -y, x, 0));
+                frames[y][x] = frame;
+                if (frame == null) {
+                    emptyX = x;
+                    emptyY = y;
+                }
+            }
+        }
+
+        //Shuffle
+        int movesLeft = width * height * 21; //works pretty well
+        while (movesLeft > 0) {
+            switch (ThreadLocalRandom.current().nextInt(4)) {
+                case 0: //down
+                    if (emptyY > 0) {
+                        frames[emptyY][emptyX] = frames[emptyY - 1][emptyX];
+                        frames[emptyY - 1][emptyX] = null;
+                        emptyY--;
+                        movesLeft--;
+                    }
+                    break;
+                case 1: //up
+                    if (emptyY < height - 1) {
+                        frames[emptyY][emptyX] = frames[emptyY + 1][emptyX];
+                        frames[emptyY + 1][emptyX] = null;
+                        emptyY++;
+                        movesLeft--;
+                    }
+                    break;
+                case 2: //right
+                    if (emptyX > 0) {
+                        frames[emptyY][emptyX] = frames[emptyY][emptyX - 1];
+                        frames[emptyY][emptyX - 1] = null;
+                        emptyX--;
+                        movesLeft--;
+                    }
+                    break;
+                case 3: //left
+                    if (emptyX < width - 1) {
+                        frames[emptyY][emptyX] = frames[emptyY][emptyX + 1];
+                        frames[emptyY][emptyX + 1] = null;
+                        emptyX++;
+                        movesLeft--;
+                    }
+                    break;
+            }
+        }
+
+        //Teleport the item frames
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if (frames[y][x] != null) {
+                    frames[y][x].teleport(Util.getRelative(location, blockFace.getOppositeFace(), -y, x, 0));
+                }
+            }
         }
     }
 }

@@ -2,10 +2,12 @@ package de.craften.plugins.gempuzzle;
 
 import de.craften.plugins.gempuzzle.util.Util;
 import org.bukkit.Location;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 
@@ -41,6 +43,15 @@ public class ItemFrameListener implements Listener {
                     event.getPlayer().sendMessage("This isn't a gem puzzle.");
                 }
                 event.setCancelled(true);
+            } else if (event.getPlayer().hasMetadata("gempuzzle.shuffle")) {
+                event.getPlayer().removeMetadata("gempuzzle.shuffle", plugin);
+                Puzzle puzzle = plugin.getPuzzleAt(event.getRightClicked().getLocation());
+                if (puzzle != null) {
+                    puzzle.shuffle();
+                } else {
+                    event.getPlayer().sendMessage("This isn't a gem puzzle.");
+                }
+                event.setCancelled(true);
             } else {
                 Puzzle puzzle = plugin.getPuzzleAt(event.getRightClicked().getLocation());
                 if (puzzle != null) {
@@ -60,6 +71,18 @@ public class ItemFrameListener implements Listener {
                 event.setCancelled(true);
                 event.setDamage(0);
                 tryMove((ItemFrame) event.getEntity(), puzzle);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onRedstone(BlockRedstoneEvent event) {
+        if (event.getOldCurrent() == 0 && event.getNewCurrent() > 0) {
+            for (BlockFace blockFace : new BlockFace[]{BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN}) {
+                Puzzle puzzle = plugin.getPuzzleAt(event.getBlock().getRelative(blockFace).getLocation());
+                if (puzzle != null) {
+                    puzzle.shuffle();
+                }
             }
         }
     }
