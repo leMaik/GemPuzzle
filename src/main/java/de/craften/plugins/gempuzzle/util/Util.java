@@ -40,10 +40,17 @@ public class Util {
 
     public static ItemFrame getItemFrame(Location location) {
         for (Entity nearbyEntity : location.getWorld().getNearbyEntities(location, 1, 1, 1)) {
-            if (nearbyEntity instanceof ItemFrame && nearbyEntity.getLocation().getBlock().getLocation().equals(location)) {
+            if (nearbyEntity instanceof ItemFrame && isBlockLocationEqual(nearbyEntity.getLocation(), location)) {
                 return (ItemFrame) nearbyEntity;
             }
         }
         return null;
+    }
+
+    public static boolean isBlockLocationEqual(Location a, Location b) {
+        return a.getBlockX() == b.getBlockX() &&
+                a.getBlockY() == b.getBlockY() &&
+                a.getBlockZ() == b.getBlockZ() &&
+                a.getWorld().equals(b.getWorld());
     }
 }

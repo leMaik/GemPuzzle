@@ -4,6 +4,7 @@ import de.craften.plugins.gempuzzle.util.Util;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ItemFrame;
+import org.bukkit.util.Vector;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -125,7 +126,8 @@ public class Puzzle {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 if (frames[y][x] != null) {
-                    frames[y][x].teleport(Util.getRelative(location, blockFace.getOppositeFace(), -y, x, 0));
+                    frames[y][x].teleport(Util.getRelative(location, blockFace.getOppositeFace(), -y, x, 0)
+                            .setDirection(new Vector(blockFace.getModX(), blockFace.getModY(), blockFace.getModZ())));
                 }
             }
         }
