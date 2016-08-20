@@ -2,6 +2,7 @@ package de.craften.plugins.gempuzzle;
 
 import de.craften.plugins.gempuzzle.util.Util;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.util.Vector;
@@ -16,12 +17,22 @@ public class Puzzle {
     private final int width;
     private final int height;
     private final BlockFace blockFace;
+    private final Short[] mapIds;
+
+    public Puzzle(Location location, int width, int height, BlockFace blockFace, Short[] mapIds) {
+        this.location = location;
+        this.width = width;
+        this.height = height;
+        this.blockFace = blockFace;
+        this.mapIds = mapIds;
+    }
 
     public Puzzle(Location location, int width, int height, BlockFace blockFace) {
         this.location = location;
         this.width = width;
         this.height = height;
         this.blockFace = blockFace;
+        this.mapIds = getMapIds();
     }
 
     public Location getLocation() {
@@ -65,6 +76,33 @@ public class Puzzle {
             default:
                 return false;
         }
+    }
+
+    /**
+     * Checks if this puzzle is solved.
+     *
+     * @return true if this puzzle is solved, false if not
+     */
+    public boolean isSolved() {
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                ItemFrame frame = Util.getItemFrame(Util.getRelative(location, blockFace.getOppositeFace(), -y, x, 0));
+
+                if (frame != null) {
+                    if (this.mapIds[y * width + x] == null) {
+                        return false;
+                    }
+                    if (!(frame.getItem() != null &&
+                            frame.getItem().getType() == Material.MAP &&
+                            frame.getItem().getDurability() == this.mapIds[y * width + x])) {
+                        return false;
+                    }
+                } else if (this.mapIds[y * width + x] != null) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public void shuffle() {
@@ -131,5 +169,49 @@ public class Puzzle {
                 }
             }
         }
+    }
+
+    public static Short[] stringToMapIds(String serializedMapIds) {
+        String[] idStrings = serializedMapIds.split(",");
+        Short[] mapIds = new Short[idStrings.length];
+        for (int i = 0; i < idStrings.length; i++) {
+            if (idStrings[i].equals("null")) {
+                mapIds[i] = null;
+            } else {
+                mapIds[i] = Short.valueOf(idStrings[i]);
+            }
+        }
+        return mapIds;
+    }
+
+    public Short[] getMapIds() {
+        Short[] mapIds = new Short[width * height];
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                ItemFrame frame = Util.getItemFrame(Util.getRelative(location, blockFace.getOppositeFace(), -y, x, 0));
+                if (frame != null && frame.getItem() != null && frame.getItem().getType() == Material.MAP) {
+                    mapIds[y * width + x] = frame.getItem().getDurability();
+                } else {
+                    mapIds[y * width + x] = null;
+                }
+            }
+        }
+        return mapIds;
+    }
+
+    public String getMapIdsAsString() {
+        Short[] mapIds = getMapIds();
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < mapIds.length; i++) {
+            if (i > 0) {
+                builder.append(',');
+            }
+            if (mapIds[i] == null) {
+                builder.append("null");
+            } else {
+                builder.append(mapIds[i].toString());
+            }
+        }
+        return builder.toString();
     }
 }

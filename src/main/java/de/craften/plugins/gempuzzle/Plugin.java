@@ -33,7 +33,8 @@ public class Plugin extends JavaPlugin {
                             Double.parseDouble(puzzleMap.get("z").toString())),
                     Integer.parseInt(puzzleMap.get("width").toString()),
                     Integer.parseInt(puzzleMap.get("height").toString()),
-                    BlockFace.valueOf(puzzleMap.get("blockFace").toString())
+                    BlockFace.valueOf(puzzleMap.get("blockFace").toString()),
+                    Puzzle.stringToMapIds(puzzleMap.get("mapIds").toString())
             ));
         }
 
@@ -119,6 +120,7 @@ public class Plugin extends JavaPlugin {
             puzzleMap.put("width", puzzle.getWidth());
             puzzleMap.put("height", puzzle.getHeight());
             puzzleMap.put("blockFace", puzzle.getBlockFace().name());
+            puzzleMap.put("mapIds", puzzle.getMapIdsAsString());
         }
 
         getConfig().set("puzzles", puzzleMaps);
