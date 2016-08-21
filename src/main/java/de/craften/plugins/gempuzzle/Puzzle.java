@@ -123,38 +123,43 @@ public class Puzzle {
 
         //Shuffle
         int movesLeft = width * height * 21; //works pretty well
+        int prev = -1;
         while (movesLeft > 0) {
             switch (ThreadLocalRandom.current().nextInt(4)) {
                 case 0: //down
-                    if (emptyY > 0) {
+                    if (emptyY > 0 && prev != 1) {
                         frames[emptyY][emptyX] = frames[emptyY - 1][emptyX];
                         frames[emptyY - 1][emptyX] = null;
                         emptyY--;
                         movesLeft--;
+                        prev = 0;
                     }
                     break;
                 case 1: //up
-                    if (emptyY < height - 1) {
+                    if (emptyY < height - 1 && prev != 0) {
                         frames[emptyY][emptyX] = frames[emptyY + 1][emptyX];
                         frames[emptyY + 1][emptyX] = null;
                         emptyY++;
                         movesLeft--;
+                        prev = 1;
                     }
                     break;
                 case 2: //right
-                    if (emptyX > 0) {
+                    if (emptyX > 0 && prev != 3) {
                         frames[emptyY][emptyX] = frames[emptyY][emptyX - 1];
                         frames[emptyY][emptyX - 1] = null;
                         emptyX--;
                         movesLeft--;
+                        prev = 2;
                     }
                     break;
                 case 3: //left
-                    if (emptyX < width - 1) {
+                    if (emptyX < width - 1 && prev != 2) {
                         frames[emptyY][emptyX] = frames[emptyY][emptyX + 1];
                         frames[emptyY][emptyX + 1] = null;
                         emptyX++;
                         movesLeft--;
+                        prev = 3;
                     }
                     break;
             }
