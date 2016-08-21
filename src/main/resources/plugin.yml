@@ -1,6 +1,7 @@
 name: GemPuzzle
 main: de.craften.plugins.gempuzzle.Plugin
 version: VERSION
+softdepend: [GemApi]
 commands:
   gempuzzle:
     description: Create or remove gem puzzles.

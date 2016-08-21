@@ -56,7 +56,13 @@ public class ItemFrameListener implements Listener {
                 Puzzle puzzle = plugin.getPuzzleAt(event.getRightClicked().getLocation());
                 if (puzzle != null) {
                     event.setCancelled(true);
-                    tryMove((ItemFrame) event.getRightClicked(), puzzle);
+                    if (!puzzle.isSolved()) {
+                        if (tryMove((ItemFrame) event.getRightClicked(), puzzle) && puzzle.isSolved()) {
+                            plugin.onPuzzleSolved(puzzle, event.getPlayer());
+                        }
+                    } else {
+                        event.getPlayer().sendMessage("This puzzle is already solved. You need to shuffle it first.");
+                    }
                 }
             }
         }
@@ -65,12 +71,17 @@ public class ItemFrameListener implements Listener {
     @EventHandler
     public void onPlayerAttackEntity(EntityDamageByEntityEvent event) {
         if (event.getEntity() instanceof ItemFrame && event.getDamager() instanceof Player) {
-            Puzzle puzzle =
-                    plugin.getPuzzleAt(event.getEntity().getLocation());
+            Puzzle puzzle = plugin.getPuzzleAt(event.getEntity().getLocation());
             if (puzzle != null) {
                 event.setCancelled(true);
                 event.setDamage(0);
-                tryMove((ItemFrame) event.getEntity(), puzzle);
+                if (!puzzle.isSolved()) {
+                    if (tryMove((ItemFrame) event.getEntity(), puzzle) && puzzle.isSolved()) {
+                        plugin.onPuzzleSolved(puzzle, (Player) event.getDamager());
+                    }
+                } else {
+                    event.getDamager().sendMessage("This puzzle is already solved. You need to shuffle it first.");
+                }
             }
         }
     }

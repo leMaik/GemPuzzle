@@ -18,13 +18,15 @@ public class Puzzle {
     private final int height;
     private final BlockFace blockFace;
     private final Short[] mapIds;
+    private final int gemReward;
 
-    public Puzzle(Location location, int width, int height, BlockFace blockFace, Short[] mapIds) {
+    public Puzzle(Location location, int width, int height, BlockFace blockFace, Short[] mapIds, int gemReward) {
         this.location = location;
         this.width = width;
         this.height = height;
         this.blockFace = blockFace;
         this.mapIds = mapIds;
+        this.gemReward = gemReward;
     }
 
     public Puzzle(Location location, int width, int height, BlockFace blockFace) {
@@ -33,6 +35,7 @@ public class Puzzle {
         this.height = height;
         this.blockFace = blockFace;
         this.mapIds = getMapIds();
+        this.gemReward = 0;
     }
 
     public Location getLocation() {
@@ -189,7 +192,7 @@ public class Puzzle {
         return mapIds;
     }
 
-    public Short[] getMapIds() {
+    private Short[] getMapIds() {
         Short[] mapIds = new Short[width * height];
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
@@ -205,7 +208,6 @@ public class Puzzle {
     }
 
     public String getMapIdsAsString() {
-        Short[] mapIds = getMapIds();
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < mapIds.length; i++) {
             if (i > 0) {
@@ -218,5 +220,9 @@ public class Puzzle {
             }
         }
         return builder.toString();
+    }
+
+    public int getGemReward() {
+        return gemReward;
     }
 }

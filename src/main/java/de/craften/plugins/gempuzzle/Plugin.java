@@ -1,7 +1,10 @@
 package de.craften.plugins.gempuzzle;
 
 import de.craften.plugins.gempuzzle.util.Util;
+import me.mickyjou.plugins.gems.api.GemProvider;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
@@ -34,7 +37,8 @@ public class Plugin extends JavaPlugin {
                     Integer.parseInt(puzzleMap.get("width").toString()),
                     Integer.parseInt(puzzleMap.get("height").toString()),
                     BlockFace.valueOf(puzzleMap.get("blockFace").toString()),
-                    Puzzle.stringToMapIds(puzzleMap.get("mapIds").toString())
+                    Puzzle.stringToMapIds(puzzleMap.get("mapIds").toString()),
+                    puzzleMap.containsKey("gemReward") ? Integer.parseInt(puzzleMap.get("gemReward").toString()) : 0
             ));
         }
 
@@ -121,9 +125,27 @@ public class Plugin extends JavaPlugin {
             puzzleMap.put("height", puzzle.getHeight());
             puzzleMap.put("blockFace", puzzle.getBlockFace().name());
             puzzleMap.put("mapIds", puzzle.getMapIdsAsString());
+            if (puzzle.getGemReward() > 0) {
+                puzzleMap.put("gemReward", puzzle.getGemReward());
+            }
         }
 
         getConfig().set("puzzles", puzzleMaps);
         super.saveConfig();
+    }
+
+    public void onPuzzleSolved(Puzzle puzzle, Player player) {
+        player.playSound(player.getLocation(), Sound.LEVEL_UP, 1, 1);
+        player.sendMessage("You solved the puzzle!");
+
+        int gemReward = puzzle.getGemReward();
+        if (gemReward > 0 && Bukkit.getServicesManager().isProvidedFor(GemProvider.class)) {
+            Bukkit.getServicesManager().getRegistration(GemProvider.class).getProvider().addGems(player, gemReward);
+            if (gemReward == 1) {
+                player.sendMessage("You won 1 Gem for solving the puzzle.");
+            } else {
+                player.sendMessage("You won " + gemReward + " Gems for solving the puzzle.");
+            }
+        }
     }
 }
